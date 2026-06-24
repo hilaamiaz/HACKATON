@@ -24,7 +24,7 @@ from PIL import Image
 from torch.utils.data import DataLoader, Dataset
 from torchvision import transforms
 
-from labels import (
+from Scripts.labels import (
     HF_INDEX_TO_NAME,
     HF_INDEX_TO_IDX,
     TARGET_HF_INDICES,

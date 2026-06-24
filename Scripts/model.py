@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 
-
 class ModelArchitecture(nn.Module):
     def __init__(self):
         super(ModelArchitecture, self).__init__()
@@ -23,17 +22,17 @@ class ModelArchitecture(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2),
 
-
-            nn.AdaptiveAvgPool2d((28, 28))
+            # Optimization: Reduced spatial size to 7x7 to prevent memory crashes
+            nn.AdaptiveAvgPool2d((7, 7))
         )
 
         # Classifier Head
         self.classifier = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(64 * 28 * 28, 512),
+            nn.Linear(64 * 7 * 7, 512),
             nn.ReLU(),
             nn.Dropout(p=0.5),
-            nn.Linear(512, 20)
+            nn.Linear(512, 20) # 20 output classes required by the hackathon
         )
 
     def forward(self, x):

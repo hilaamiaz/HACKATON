@@ -5,7 +5,8 @@ from torch.utils.data import DataLoader, Subset
 from torchvision import datasets, transforms
 import joblib
 import os
-import zipfile
+import zipfile  # <-- הוספנו את הספרייה הזו
+
 from model import ModelArchitecture
 
 
@@ -14,29 +15,22 @@ def train():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Training on device: {device}")
 
-    # --- פתרון הנתיבים והחילוץ האוטומטי (מותאם לתמונה שלך) ---
-    # הולך לתיקייה הנוכחית שבה נמצא הסקריפט (תיקיית Scripts לפי התמונה שלך)
-    script_dir = os.path.dirname(os.path.abspath(__file__))
+    # --- 1.5 חילוץ אוטומטי של קובץ ה-ZIP ---
+    dataset_path = os.path.join("..", "dataset", "train_set")
+    zip_path = "train_set.zip"  # מניח שקובץ ה-ZIP נמצא באותה תיקייה של train.py
 
-    # התיקייה dataset נמצאת יחד עם הסקריפטים
-    dataset_base = os.path.join(script_dir, "dataset")
-    zip_path = os.path.join(dataset_base, "train_set.zip")
-    dataset_path = dataset_base
-
-    # חילוץ אוטומטי של ה-ZIP אם תיקיית התמונות עדיין לא קיימת
+    # אם התיקייה עוד לא קיימת, נחלץ אותה מה-ZIP
     if not os.path.exists(dataset_path):
-        print(f"Checking for ZIP file at: {zip_path}")
         if os.path.exists(zip_path):
-            print(f"Found ZIP! Extracting to: {dataset_base} ...")
-            # מחלץ את התוכן של ה-zip לתוך תיקיית dataset
+            print(f"Extracting {zip_path} to {dataset_path}...")
+            # יוצר את תיקיית היעד במקרה שהיא לא קיימת
+            os.makedirs(os.path.dirname(dataset_path), exist_ok=True)
+
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                zip_ref.extractall(dataset_base)
+                zip_ref.extractall(os.path.join("..", "dataset"))
             print("Extraction complete!")
         else:
-            raise FileNotFoundError(
-                f"\n\n❌ Error: Could not find the zip file!\n"
-                f"Expected to find it at: {zip_path}\n"
-            )
+            print(f"⚠️ Warning: Could not find zip file at {zip_path} and dataset folder does not exist.")
 
     # 1. Data Augmentation for Robustness
     train_transforms = transforms.Compose([
@@ -56,7 +50,7 @@ def train():
     ])
 
     # 2. Load Dataset and Split Properly
-    print(f"Loading images from: {dataset_path}")
+    # (הקוד כבר משתמש ב-dataset_path שהגדרנו למעלה)
     full_train_dataset = datasets.ImageFolder(root=dataset_path, transform=train_transforms)
     full_val_dataset = datasets.ImageFolder(root=dataset_path, transform=val_transforms)
 
@@ -81,7 +75,6 @@ def train():
     epochs = 10
 
     # 4. Training Loop
-    print("Starting training loop...")
     for epoch in range(epochs):
         model.train()
         running_loss = 0.0
@@ -117,7 +110,7 @@ def train():
     print("Training complete. Saving weights...")
     state_dict = model.cpu().state_dict()
     joblib.dump(state_dict, "weights.joblib")
-    print("Saved to weights.joblib successfully!")
+    print("Saved to weights.joblib")
 
 
 if __name__ == "__main__":
