@@ -23,8 +23,7 @@ class ModelArchitecture(nn.Module):
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=2, stride=2),
 
-            # --- הפתרון הקסום ---
-            # שכבה זו מבטיחה שהפלט יהיה תמיד 64x28x28, לא משנה מה גודל התמונה שנכנסה
+
             nn.AdaptiveAvgPool2d((28, 28))
         )
 
