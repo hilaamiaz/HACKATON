@@ -14,8 +14,7 @@ def train():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Training on device: {device}")
 
-    # --- פתרון הנתיבים והחילוץ האוטומטי (מותאם לתמונה שלך) ---
-    # הולך לתיקייה הנוכחית שבה נמצא הסקריפט (תיקיית Scripts לפי התמונה שלך)
+
     script_dir = os.path.dirname(os.path.abspath(__file__))
 
     # התיקייה dataset נמצאת יחד עם הסקריפטים
